@@ -1,0 +1,19 @@
+{
+	"name": "tomaskarlik/select2input",
+	"type": "library",
+	"description": "Select2 form input for Nette",
+	"keywords": ["input", "forms", "nette", "select2"],
+	"license": ["BSD-3-Clause", "GPL-2.0", "GPL-3.0"],
+	"authors": [
+		{ "name": "Tomáš Karlík", "homepage": "http://tomaskarlik.cz" }
+	],
+	"require": {
+		"php": "^7.1",
+		"nette/di": "^2.4"
+	},
+	"autoload": {
+		"psr-4": {
+			"TomasKarlik\\Select2Input\\": "src"
+		}
+	}
+}
