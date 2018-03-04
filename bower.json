@@ -1,0 +1,6 @@
+{
+	"name": "select2input",
+	"dependencies": {
+		"select2": "~4.0"
+	}
+}

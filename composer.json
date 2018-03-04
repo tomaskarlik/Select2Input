@@ -9,7 +9,12 @@
 	],
 	"require": {
 		"php": "^7.1",
-		"nette/di": "^2.4"
+		"nette/application": "^2.4",
+		"nette/di": "^2.4",
+		"nette/forms": "^2.4",
+		"nette/php-generator": "^2.4",
+		"nette/reflection": "^2.4",
+		"nette/utils": "^2.4"
 	},
 	"autoload": {
 		"psr-4": {
