@@ -11,7 +11,7 @@ use Nette\Application\UI\ComponentReflection;
 use Nette\Application\UI\Form;
 use Nette\Application\UI\ISignalReceiver;
 use Nette\Application\UI\Presenter;
-use Nette\Forms\Controls\ChoiceControl;
+use Nette\Forms\Controls\BaseControl;
 use Nette\Forms\Helpers;
 use Nette\Reflection\ClassType;
 use Nette\Reflection\Method;
@@ -19,7 +19,7 @@ use Nette\Utils\Html;
 use stdClass;
 
 
-final class Select2Input extends ChoiceControl implements ISignalReceiver
+final class Select2Input extends BaseControl implements ISignalReceiver
 {
 
 	/**
@@ -41,6 +41,11 @@ final class Select2Input extends ChoiceControl implements ISignalReceiver
 	 * @var int
 	 */
 	private $resultsPerPage = 25;
+
+	/**
+	 * @var Select2ResultEntity|NULL
+	 */
+	private $selectedValue = NULL;
 
 
 	public function __construct(
@@ -71,7 +76,8 @@ final class Select2Input extends ChoiceControl implements ISignalReceiver
 		$attributes = parent::getControl()->attrs;
 		$attributes['data-select2-url'] = $this->link('autocomplete!');
 
-		return Helpers::createSelectBox($this->items)
+		$items = $this->selectedValue !== NULL ? [$this->selectedValue->getId() => (string) $this->selectedValue] : [];
+		return Helpers::createSelectBox($items)
 			->addAttributes($attributes)
 			->addClass('select2');
 	}
@@ -187,19 +193,24 @@ final class Select2Input extends ChoiceControl implements ISignalReceiver
 	}
 
 
-	public function loadHttpData(): void
+	/**
+	 * {@inheritdoc}
+	 */
+	public function setValue($value)
 	{
-		parent::loadHttpData();
-
-		if ($this->checkAllowedValues && $this->value !== NULL) {
-			$item = $this->dataSource->findByKey($this->value);
+		$this->selectedValue = NULL;
+		if ($value !== NULL) {
+			$item = $this->dataSource->findByKey($value);
 			if ( ! $item) {
-				throw new InvalidArgumentException(sprintf('Value "%s" is not allowed!', $this->value));
+				throw new InvalidArgumentException(sprintf('Value "%s" is not allowed!', $value));
 			}
 
 			$item->setSelected(TRUE);
-			$this->setItems([$item->getId() => $item]);
+			$this->selectedValue = $item;
 		}
+
+		parent::setValue($value);
+		return $this;
 	}
 
 
