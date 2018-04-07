@@ -61,7 +61,7 @@ final class Select2InputMultiple extends AbstractInput
 			$value = (array) $value;
 
 		} elseif ( ! is_array($value)) {
-			throw new InvalidArgumentException(sprintf('Value must be array or NULL, %s given in field "%s".', gettype($values), $this->name));
+			throw new InvalidArgumentException(sprintf('Value must be array or NULL, %s given in field "%s".', gettype($value), $this->name));
 		}
 
 		if (count($value)) {
