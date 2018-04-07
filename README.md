@@ -39,6 +39,7 @@ $form = new Form;
 $form->addSelect2('client_id', $clientRepository, 'Klient:')
 	->setRequired('Vyberte klienta!')
 	->setResultsPerPage(15);
+$form->addSelect2Multiple('clients', $clientRepository, 'Klienti:')
 ```
 
 Datasource example
@@ -63,8 +64,7 @@ class ClientRepository implements ISelect2DataSource
 		$return = [];
 		$selection = $this->getClientTable()
 			->where(
-				'company LIKE lower(unaccent(?))',
-				'%' . Strings::lower($query) . '%'
+				'company ILIKE ?', '%' . $query . '%'
 			)
 			->order('company')
 			->select('client.id, client.company')
@@ -88,8 +88,7 @@ class ClientRepository implements ISelect2DataSource
 	{
 		return $this->getClientTable()
 			->where(
-				'company LIKE lower(unaccent(?))',
-				'%' . Strings::lower($query) . '%'
+				'company ILIKE ?', '%' . $query . '%'
 			)
 			->count('*');
 	}

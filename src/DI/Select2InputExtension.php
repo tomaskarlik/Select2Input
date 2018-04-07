@@ -9,7 +9,9 @@ use Nette\Forms\Container;
 use Nette\PhpGenerator\ClassType;
 use Nette\Utils\ObjectMixin;
 use TomasKarlik\Select2Input\ISelect2DataSource;
+use TomasKarlik\Select2Input\ISelect2DataSourceMultiple;
 use TomasKarlik\Select2Input\Select2Input;
+use TomasKarlik\Select2Input\Select2InputMultiple;
 
 
 final class Select2InputExtension extends CompilerExtension
@@ -18,12 +20,13 @@ final class Select2InputExtension extends CompilerExtension
 	public function afterCompile(ClassType $class): void
 	{
 		$initializeMethod = $class->getMethod('initialize');
-		$initializeMethod->addBody(__CLASS__ . '::registerControl();');
+		$initializeMethod->addBody(__CLASS__ . '::registerControls();');
 	}
 
 
-	public static function registerControl(): void
+	public static function registerControls(): void
 	{
+		// addSelect2()
 		ObjectMixin::setExtensionMethod(Container::class, 'addSelect2', function (
 			Container $container,
 			string $name,
@@ -31,6 +34,16 @@ final class Select2InputExtension extends CompilerExtension
 			?string $label = NULL
 		) {
 			return $container[$name] = new Select2Input($dataSource, $label);
+		});
+
+		// addSelect2Multiple()
+		ObjectMixin::setExtensionMethod(Container::class, 'addSelect2Multiple', function (
+			Container $container,
+			string $name,
+			ISelect2DataSourceMultiple $dataSource,
+			?string $label = NULL
+		) {
+			return $container[$name] = new Select2InputMultiple($dataSource, $label);
 		});
 	}
 
