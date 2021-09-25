@@ -64,8 +64,8 @@ abstract class AbstractInput extends BaseControl implements ISignalReceiver
 	{
 		$presenter = $this->getPresenter();
 
-		$query = $presenter->getParam($this->queryParamName);
-		$page = max((int) $presenter->getParam($this->pageParamName, 1), 1);
+		$query = $presenter->getParameter($this->queryParamName);
+		$page = max((int) $presenter->getParameter($this->pageParamName, 1), 1);
 
 		$return = [
 			'results' => [],

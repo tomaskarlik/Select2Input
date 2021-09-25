@@ -5,7 +5,6 @@ declare(strict_types = 1);
 namespace TomasKarlik\Select2Input;
 
 use InvalidArgumentException;
-use Nette\Application\UI\Form;
 
 
 final class Select2Input extends AbstractInput
