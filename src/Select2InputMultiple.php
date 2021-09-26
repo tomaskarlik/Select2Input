@@ -18,7 +18,7 @@ final class Select2InputMultiple extends AbstractInput
 	private $dataSource;
 
 	/**
-	 * @var Select2ResultEntity[]
+	 * @var array<string|int, string>
 	 */
 	private $selectedValues = [];
 
@@ -36,7 +36,7 @@ final class Select2InputMultiple extends AbstractInput
 	public function getControl(): Html
 	{
 		$control = parent::getControl();
-		$control->multiple(TRUE);
+		$control->setAttribute('multiple', TRUE);
 		return $control;
 	}
 
@@ -51,7 +51,8 @@ final class Select2InputMultiple extends AbstractInput
 
 
 	/**
-	 * {@inheritdoc}
+	 * @param mixed $value
+	 * @return static
 	 */
 	public function setValue($value)
 	{
@@ -71,7 +72,7 @@ final class Select2InputMultiple extends AbstractInput
 			}
 
 			foreach ($items as $item) {
-				$this->selectedValues[$item->getId()] = (string) $item;
+				$this->selectedValues[$item->getId()] = $item->getText();
 			}
 		}
 
@@ -79,6 +80,9 @@ final class Select2InputMultiple extends AbstractInput
 	}
 
 
+	/**
+	 * @return string|int
+	 */
 	public function getRawValue()
 	{
 		return $this->value;
@@ -100,6 +104,9 @@ final class Select2InputMultiple extends AbstractInput
 	}
 
 
+	/**
+	 * @return array<string|int, string>
+	 */
 	protected function getSelectedItems(): array
 	{
 		return $this->selectedValues;

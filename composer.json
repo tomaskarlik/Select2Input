@@ -20,5 +20,11 @@
 		"psr-4": {
 			"TomasKarlik\\Select2Input\\": "src"
 		}
+	},
+	"require-dev": {
+		"phpstan/phpstan": "^0.12.99"
+	},
+	"scripts": {
+		"phpstan": "php ./vendor/phpstan/phpstan/phpstan analyse -l max src"
 	}
 }

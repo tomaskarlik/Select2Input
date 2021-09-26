@@ -11,7 +11,7 @@ final class Select2Input extends AbstractInput
 {
 
 	/**
-	 * @var ISelect2DataSourceMultiple
+	 * @var Select2DataSource
 	 */
 	private $dataSource;
 
@@ -32,7 +32,8 @@ final class Select2Input extends AbstractInput
 
 
 	/**
-	 * {@inheritdoc}
+	 * @param mixed $value
+	 * @return static
 	 */
 	public function setValue($value)
 	{
@@ -57,9 +58,12 @@ final class Select2Input extends AbstractInput
 	}
 
 
+	/**
+	 * @return array<string|int, string>
+	 */
 	protected function getSelectedItems(): array
 	{
-		return $this->selectedValue !== NULL ? [$this->selectedValue->getId() => (string) $this->selectedValue] : [];
+		return $this->selectedValue !== NULL ? [$this->selectedValue->getId() => $this->selectedValue->getText()] : [];
 	}
 
 }

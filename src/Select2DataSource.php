@@ -32,7 +32,8 @@ class Select2DataSource implements ISelect2DataSearch
 	public function findByKey($key): ?Select2ResultEntity
 	{
 		$results = $this->select2DataSourceMultiple->findByKeys([$key]);
-		return reset($results);
+		$first = reset($results);
+		return $first === FALSE ? NULL : $first;
 	}
 
 }

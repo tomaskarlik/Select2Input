@@ -50,13 +50,15 @@ abstract class AbstractInput extends BaseControl implements ISignalReceiver
 
 	public function getControl(): Html
 	{
-		$attributes = parent::getControl()->attrs;
-		$attributes['data-select2-url'] = $this->link('autocomplete!');
+		$control = parent::getControl();
+		assert($control instanceof Html);
 
 		$items = $this->getSelectedItems();
 		return Helpers::createSelectBox($items, NULL, array_keys($items))
-			->addAttributes($attributes)
-			->addClass('select2');
+			->addAttributes([
+				'data-select2-url' => $this->link('autocomplete!'),
+				'class' => 'select2',
+			]);
 	}
 
 
@@ -71,8 +73,8 @@ abstract class AbstractInput extends BaseControl implements ISignalReceiver
 			'results' => [],
 			'total_count' => 0,
 			'pagination' => [
-				'more' => FALSE
-			]
+				'more' => FALSE,
+			],
 		];
 
 		if (empty($query)) {
@@ -99,13 +101,13 @@ abstract class AbstractInput extends BaseControl implements ISignalReceiver
 
 
 	/**
-	 * {@inheritdoc}
+	 * @param string $signal
 	 */
 	public function signalReceived($signal): void
 	{
 		$method = $this->formatSignalMethod($signal);
 		$reflection = new ClassType($this);
-		if ( ! $reflection->hasMethod($method)) {
+		if ($method === NULL || !$reflection->hasMethod($method)) {
 			throw new BadSignalException(sprintf('There is no handler for signal "%s"', $signal));
 		}
 		$reflectionMethod = $reflection->getMethod($method);
@@ -115,7 +117,7 @@ abstract class AbstractInput extends BaseControl implements ISignalReceiver
 
 	public static function formatSignalMethod(?string $signal): ?string
 	{
-		return $signal == NULL ? NULL : 'handle' . $signal;
+		return $signal === NULL ? NULL : 'handle' . $signal;
 	}
 
 
@@ -161,6 +163,9 @@ abstract class AbstractInput extends BaseControl implements ISignalReceiver
 	protected abstract function getDataSource(): ISelect2DataSearch;
 
 
+	/**
+	 * @return array<string|int, string>
+	 */
 	protected abstract function getSelectedItems(): array;
 
 
@@ -173,6 +178,9 @@ abstract class AbstractInput extends BaseControl implements ISignalReceiver
 	}
 
 
+	/**
+	 * @param array<string, mixed> $params
+	 */
 	private function link(string $destination, array $params = []): string
 	{
 		if (substr($destination, -1) !== '!') { // only signals
@@ -188,7 +196,7 @@ abstract class AbstractInput extends BaseControl implements ISignalReceiver
 	{
 		$row = [
 			'id' => $result->getId(),
-			'text' => (string) $result
+			'text' => (string) $result,
 		];
 
 		if ($result->isSelected()) {

@@ -16,10 +16,10 @@ class Select2ResultEntity
 	/**
 	 * @var Select2ResultEntity[]
 	 */
-	private $childrens = [];
+	private $children = [];
 
 	/**
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	private $customParams = [];
 
@@ -52,7 +52,7 @@ class Select2ResultEntity
 	}
 
 
-	public function getText(): String
+	public function getText(): string
 	{
 		return $this->text;
 	}
@@ -76,28 +76,29 @@ class Select2ResultEntity
 	}
 
 
-	public function addChildren(Select2ResultEntity $entity)
+	public function addChildren(Select2ResultEntity $entity): void
 	{
-		$this->childrens[] = $entity;
+		$this->children[] = $entity;
 	}
 
 
+	/**
+	 * @return Select2ResultEntity[]
+	 */
 	public function getChilds(): array
 	{
-		return $this->childrens;
+		return $this->children;
 	}
 
 
 	public function hashChilds(): bool
 	{
-		return (bool) count($this->childrens);
+		return (bool) count($this->children);
 	}
 
 
 	/**
-	 * @param string $name
 	 * @param mixed $value
-	 * @return void
 	 */
 	public function addCustomParam(string $name, $value): void
 	{
@@ -105,6 +106,9 @@ class Select2ResultEntity
 	}
 
 
+	/**
+	 * @return array<string, mixed>
+	 */
 	public function getCustomParams(): array
 	{
 		return $this->customParams;
