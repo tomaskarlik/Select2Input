@@ -11,7 +11,7 @@ final class Select2Input extends AbstractInput
 {
 
 	/**
-	 * @var ISelect2DataSource
+	 * @var ISelect2DataSourceMultiple
 	 */
 	private $dataSource;
 
@@ -22,12 +22,12 @@ final class Select2Input extends AbstractInput
 
 
 	public function __construct(
-		ISelect2DataSource $dataSource,
+		ISelect2DataSourceMultiple $dataSource,
 		string $label = NULL
 	) {
 		parent::__construct($label);
 		$this->setOption('type', 'select');
-		$this->dataSource = $dataSource;
+		$this->dataSource = new Select2DataSource($dataSource);
 	}
 
 
