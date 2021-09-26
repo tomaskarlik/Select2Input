@@ -80,21 +80,17 @@ abstract class AbstractInput extends BaseControl implements ISignalReceiver
 			return;
 		}
 
-		$count = $this->getDataSource()->searchTermCount($query);
-		if ( ! $count) {
-			$presenter->sendJson($return);
-			return;
-		}
-
 		$offsetStart = ($page - 1) * $this->resultsPerPage;
-		$offsetEnd = $offsetStart + $this->resultsPerPage;
+		$limitForCount = $this->resultsPerPage + 1;
 
-		if ($offsetEnd < $count) {
-			$return['pagination']['more'] = TRUE;
+		$results = $this->getDataSource()->searchTerm($query, $limitForCount, $offsetStart);
+		$count = count($results);
+		if ($count >= $limitForCount) {
+			$return['pagination']['more'] = true;
+			array_pop($results);
 		}
 		$return['total_count'] = $count;
 
-		$results = $this->getDataSource()->searchTerm($query, $this->resultsPerPage, $offsetStart);
 		foreach ($results as $result) {
 			$return['results'][] = $this->formatResult($result);
 		}

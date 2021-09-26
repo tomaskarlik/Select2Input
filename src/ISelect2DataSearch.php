@@ -16,7 +16,4 @@ interface ISelect2DataSearch
 	 */
 	function searchTerm(string $query, int $limit, int $offset): array;
 
-
-	function searchTermCount(string $query): int;
-
 }
