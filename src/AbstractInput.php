@@ -77,7 +77,6 @@ abstract class AbstractInput extends BaseControl implements ISignalReceiver
 
 		if (empty($query)) {
 			$presenter->sendJson($return);
-			return;
 		}
 
 		$offsetStart = ($page - 1) * $this->resultsPerPage;
@@ -165,9 +164,12 @@ abstract class AbstractInput extends BaseControl implements ISignalReceiver
 	protected abstract function getSelectedItems(): array;
 
 
-	private function getPresenter(bool $need = TRUE): ?Presenter
+	private function getPresenter(bool $need = TRUE): Presenter
 	{
-		return $this->lookup(Presenter::class, $need);
+		$presenter = $this->lookup(Presenter::class, $need);
+		assert($presenter instanceof Presenter);
+
+		return $presenter;
 	}
 
 

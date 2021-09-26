@@ -47,8 +47,7 @@ final class Select2Input extends AbstractInput
 			$this->selectedValue = $item;
 		}
 
-		parent::setValue($value);
-		return $this;
+		return parent::setValue($value);
 	}
 
 

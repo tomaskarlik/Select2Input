@@ -75,8 +75,7 @@ final class Select2InputMultiple extends AbstractInput
 			}
 		}
 
-		parent::setValue($value);
-		return $this;
+		return parent::setValue($value);
 	}
 
 
