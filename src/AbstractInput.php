@@ -55,7 +55,7 @@ abstract class AbstractInput extends BaseControl implements ISignalReceiver
 
 		$items = $this->getSelectedItems();
 		return Helpers::createSelectBox($items, NULL, array_keys($items))
-			->addAttributes([
+			->addAttributes(parent::getControl()->attrs + [
 				'data-select2-url' => $this->link('autocomplete!'),
 				'class' => 'select2',
 			]);
