@@ -1,22 +1,18 @@
-<?php
-
-declare(strict_types = 1);
+<?php declare(strict_types=1);
 
 namespace TomasKarlik\Select2Input;
 
 use InvalidArgumentException;
 use Nette\Application\UI\BadSignalException;
-use Nette\Application\UI\ISignalReceiver;
+use Nette\Application\UI\Control;
+use Nette\Application\UI\SignalReceiver;
 use Nette\Application\UI\Presenter;
 use Nette\Forms\Controls\BaseControl;
 use Nette\Forms\Helpers;
-use Nette\Reflection\ClassType;
-use Nette\Reflection\Method;
 use Nette\Utils\Html;
 use stdClass;
 
-
-abstract class AbstractInput extends BaseControl implements ISignalReceiver
+abstract class AbstractInput extends BaseControl implements SignalReceiver
 {
 
 	/**
@@ -38,13 +34,14 @@ abstract class AbstractInput extends BaseControl implements ISignalReceiver
 	public function getParameterId(string $name): string
 	{
 		$uid = $this->getUniqueId();
+
 		return $uid === '' ? $name : $uid . self::NAME_SEPARATOR . $name;
 	}
 
 
 	public function getUniqueId(): ?string
 	{
-		return $this->lookupPath(Presenter::class, TRUE);
+		return $this->lookupPath(Presenter::class, true);
 	}
 
 
@@ -54,11 +51,12 @@ abstract class AbstractInput extends BaseControl implements ISignalReceiver
 		assert($control instanceof Html);
 
 		$items = $this->getSelectedItems();
-		return Helpers::createSelectBox($items, NULL, array_keys($items))
-			->addAttributes(parent::getControl()->attrs + [
-				'data-select2-url' => $this->link('autocomplete!'),
-				'class' => 'select2',
-			]);
+
+		return Helpers::createSelectBox($items, null, array_keys($items))
+			->addAttributes($control->attrs + [
+					'data-select2-url' => $this->link('autocomplete!'),
+					'class' => 'select2',
+				]);
 	}
 
 
@@ -66,18 +64,21 @@ abstract class AbstractInput extends BaseControl implements ISignalReceiver
 	{
 		$presenter = $this->getPresenter();
 
-		$query = $presenter->getParameter($this->queryParamName);
-		$page = max((int) $presenter->getParameter($this->pageParamName, 1), 1);
+		$query = $presenter->getParameter($this->queryParamName, '');
+		assert(is_string($query));
+		$page = $presenter->getParameter($this->pageParamName, 1);
+		assert(is_string($page));
+		$page = max((int) $page, 1);
 
 		$return = [
 			'results' => [],
 			'total_count' => 0,
 			'pagination' => [
-				'more' => FALSE,
+				'more' => false,
 			],
 		];
 
-		if (empty($query)) {
+		if ($query === '') {
 			$presenter->sendJson($return);
 		}
 
@@ -100,24 +101,21 @@ abstract class AbstractInput extends BaseControl implements ISignalReceiver
 	}
 
 
-	/**
-	 * @param string $signal
-	 */
-	public function signalReceived($signal): void
+	public function signalReceived(string $signal): void
 	{
 		$method = $this->formatSignalMethod($signal);
-		$reflection = new ClassType($this);
-		if ($method === NULL || !$reflection->hasMethod($method)) {
+		$control = $this->getParentControl();
+
+		if ($method === null || !method_exists($control, $method)) {
 			throw new BadSignalException(sprintf('There is no handler for signal "%s"', $signal));
 		}
-		$reflectionMethod = $reflection->getMethod($method);
-		$reflectionMethod->invoke($this);
+		$control->{$method}();
 	}
 
 
 	public static function formatSignalMethod(?string $signal): ?string
 	{
-		return $signal === NULL ? NULL : 'handle' . $signal;
+		return $signal === null ? null : 'handle' . $signal;
 	}
 
 
@@ -130,6 +128,7 @@ abstract class AbstractInput extends BaseControl implements ISignalReceiver
 	public function setPageParamName(string $pageParamName): AbstractInput
 	{
 		$this->pageParamName = $pageParamName;
+
 		return $this;
 	}
 
@@ -143,6 +142,7 @@ abstract class AbstractInput extends BaseControl implements ISignalReceiver
 	public function setQueryParamName(string $queryParamName): AbstractInput
 	{
 		$this->queryParamName = $queryParamName;
+
 		return $this;
 	}
 
@@ -156,6 +156,7 @@ abstract class AbstractInput extends BaseControl implements ISignalReceiver
 	public function setResultsPerPage(int $resultsPerPage): AbstractInput
 	{
 		$this->resultsPerPage = $resultsPerPage;
+
 		return $this;
 	}
 
@@ -169,7 +170,7 @@ abstract class AbstractInput extends BaseControl implements ISignalReceiver
 	protected abstract function getSelectedItems(): array;
 
 
-	private function getPresenter(bool $need = TRUE): Presenter
+	private function getPresenter(bool $need = true): Presenter
 	{
 		$presenter = $this->lookup(Presenter::class, $need);
 		assert($presenter instanceof Presenter);
@@ -186,9 +187,8 @@ abstract class AbstractInput extends BaseControl implements ISignalReceiver
 		if (substr($destination, -1) !== '!') { // only signals
 			throw new InvalidArgumentException;
 		}
-		$reflectionMethod = new Method(Presenter::class, 'createRequest');
-		$reflectionMethod->setAccessible(TRUE); // @TODO better way?
-		return $reflectionMethod->invoke($this->getPresenter(), $this, $destination, $params, 'link');
+
+		return $this->getParentControl()->link($destination, $params);
 	}
 
 
@@ -200,7 +200,7 @@ abstract class AbstractInput extends BaseControl implements ISignalReceiver
 		];
 
 		if ($result->isSelected()) {
-			$row['selected'] = TRUE;
+			$row['selected'] = true;
 		}
 
 		if ($result->hashChilds()) {
@@ -217,6 +217,15 @@ abstract class AbstractInput extends BaseControl implements ISignalReceiver
 		}
 
 		return (object) $row;
+	}
+
+
+	private function getParentControl(): Control
+	{
+		$control = $this->lookup(Control::class);
+		assert($control instanceof Control);
+
+		return $control;
 	}
 
 }

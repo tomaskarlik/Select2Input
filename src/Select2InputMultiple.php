@@ -1,13 +1,12 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace TomasKarlik\Select2Input;
 
 use InvalidArgumentException;
 use Nette\Forms\Form;
 use Nette\Utils\Html;
-
 
 final class Select2InputMultiple extends AbstractInput
 {
@@ -25,8 +24,9 @@ final class Select2InputMultiple extends AbstractInput
 
 	public function __construct(
 		ISelect2DataSourceMultiple $dataSource,
-		string $label = NULL
-	) {
+		string $label = null
+	)
+	{
 		parent::__construct($label);
 		$this->setOption('type', 'select');
 		$this->dataSource = $dataSource;
@@ -36,7 +36,8 @@ final class Select2InputMultiple extends AbstractInput
 	public function getControl(): Html
 	{
 		$control = parent::getControl();
-		$control->setAttribute('multiple', TRUE);
+		$control->setAttribute('multiple', true);
+
 		return $control;
 	}
 
@@ -44,9 +45,11 @@ final class Select2InputMultiple extends AbstractInput
 	/**
 	 * {@inheritdoc}
 	 */
-	public function loadHttpData()
+	public function loadHttpData(): void
 	{
-		$this->setValue(array_keys(array_flip($this->getHttpData(Form::DATA_TEXT))));
+		$data = $this->getHttpData(Form::DATA_TEXT);
+		assert(is_array($data));
+		$this->setValue(array_keys(array_flip($data)));
 	}
 
 
@@ -58,16 +61,15 @@ final class Select2InputMultiple extends AbstractInput
 	{
 		$this->selectedValues = [];
 
-		if (is_scalar($value) || $value === NULL) {
+		if (is_scalar($value) || $value === null) {
 			$value = (array) $value;
-
-		} elseif ( ! is_array($value)) {
+		} elseif (!is_array($value)) {
 			throw new InvalidArgumentException(sprintf('Value must be array or NULL, %s given in field "%s".', gettype($value), $this->name));
 		}
 
 		if (count($value)) {
 			$items = $this->dataSource->findByKeys($value);
-			if ( ! $items) {
+			if (!$items) {
 				throw new InvalidArgumentException('Unexpected values!');
 			}
 
@@ -85,6 +87,8 @@ final class Select2InputMultiple extends AbstractInput
 	 */
 	public function getRawValue()
 	{
+		assert(is_int($this->value) || is_string($this->value));
+
 		return $this->value;
 	}
 
