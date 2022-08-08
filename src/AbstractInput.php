@@ -2,8 +2,9 @@
 
 namespace TomasKarlik\Select2Input;
 
-use InvalidArgumentException;
+use Nette\Application\IPresenter;
 use Nette\Application\UI\BadSignalException;
+use Nette\Application\UI\Component;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\SignalReceiver;
 use Nette\Application\UI\Presenter;
@@ -41,7 +42,7 @@ abstract class AbstractInput extends BaseControl implements SignalReceiver
 
 	public function getUniqueId(): ?string
 	{
-		return $this->lookupPath(Presenter::class, true);
+		return $this->lookupPath(Presenter::class);
 	}
 
 
@@ -52,9 +53,11 @@ abstract class AbstractInput extends BaseControl implements SignalReceiver
 
 		$items = $this->getSelectedItems();
 
+		$path = $this->lookupPath(IPresenter::class);
+
 		return Helpers::createSelectBox($items, null, array_keys($items))
 			->addAttributes($control->attrs + [
-					'data-select2-url' => $this->link('autocomplete!'),
+					'data-select2-url' => $this->getPresenter()->link($path . ':autocomplete!'),
 					'class' => 'select2',
 				]);
 	}
@@ -66,7 +69,7 @@ abstract class AbstractInput extends BaseControl implements SignalReceiver
 
 		$query = $presenter->getParameter($this->queryParamName, '');
 		assert(is_string($query));
-		$page = $presenter->getParameter($this->pageParamName, 1);
+		$page = $presenter->getParameter($this->pageParamName, '1');
 		assert(is_string($page));
 		$page = max((int) $page, 1);
 
@@ -103,19 +106,18 @@ abstract class AbstractInput extends BaseControl implements SignalReceiver
 
 	public function signalReceived(string $signal): void
 	{
-		$method = $this->formatSignalMethod($signal);
-		$control = $this->getParentControl();
+		$method = self::formatSignalMethod($signal);
 
-		if ($method === null || !method_exists($control, $method)) {
+		if ($method === null || !method_exists($this, $method)) {
 			throw new BadSignalException(sprintf('There is no handler for signal "%s"', $signal));
 		}
-		$control->{$method}();
+		$this->{$method}();
 	}
 
 
-	public static function formatSignalMethod(?string $signal): ?string
+	public static function formatSignalMethod(string $signal): string
 	{
-		return $signal === null ? null : 'handle' . $signal;
+		return Component::formatSignalMethod($signal);
 	}
 
 
@@ -179,19 +181,6 @@ abstract class AbstractInput extends BaseControl implements SignalReceiver
 	}
 
 
-	/**
-	 * @param array<string, mixed> $params
-	 */
-	private function link(string $destination, array $params = []): string
-	{
-		if (substr($destination, -1) !== '!') { // only signals
-			throw new InvalidArgumentException;
-		}
-
-		return $this->getParentControl()->link($destination, $params);
-	}
-
-
 	private function formatResult(Select2ResultEntity $result): stdClass
 	{
 		$row = [
@@ -217,15 +206,6 @@ abstract class AbstractInput extends BaseControl implements SignalReceiver
 		}
 
 		return (object) $row;
-	}
-
-
-	private function getParentControl(): Control
-	{
-		$control = $this->lookup(Control::class);
-		assert($control instanceof Control);
-
-		return $control;
 	}
 
 }
