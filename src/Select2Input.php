@@ -1,55 +1,47 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace TomasKarlik\Select2Input;
 
 use InvalidArgumentException;
-use Nette\Application\UI\Form;
-
 
 final class Select2Input extends AbstractInput
 {
+	private Select2DataSource $dataSource;
 
-	/**
-	 * @var ISelect2DataSource
-	 */
-	private $dataSource;
-
-	/**
-	 * @var Select2ResultEntity|NULL
-	 */
-	private $selectedValue = NULL;
+	private ?Select2ResultEntity $selectedValue = null;
 
 
 	public function __construct(
-		ISelect2DataSource $dataSource,
-		string $label = NULL
-	) {
+		ISelect2DataSourceMultiple $dataSource,
+		string $label = null
+	)
+	{
 		parent::__construct($label);
 		$this->setOption('type', 'select');
-		$this->dataSource = $dataSource;
+		$this->dataSource = new Select2DataSource($dataSource);
 	}
 
 
 	/**
-	 * {@inheritdoc}
+	 * @param int|string|null $value
+	 * @return static
 	 */
 	public function setValue($value)
 	{
-		$this->selectedValue = NULL;
-		if ($value !== NULL) {
+		$this->selectedValue = null;
+		if ($value !== null) {
 			$item = $this->dataSource->findByKey($value);
-			if ( ! $item) {
-				throw new InvalidArgumentException(sprintf('Value "%s" is not allowed!', $value));
+			if ($item === null) {
+				throw new InvalidArgumentException(sprintf('Value "%s" is not allowed!', (string) $value));
 			}
 
-			$item->setSelected(TRUE);
+			$item->setSelected(true);
 			$this->selectedValue = $item;
 		}
 
-		parent::setValue($value);
-		return $this;
+		return parent::setValue($value);
 	}
 
 
@@ -59,9 +51,12 @@ final class Select2Input extends AbstractInput
 	}
 
 
+	/**
+	 * @return array<string|int, string>
+	 */
 	protected function getSelectedItems(): array
 	{
-		return $this->selectedValue !== NULL ? [$this->selectedValue->getId() => (string) $this->selectedValue] : [];
+		return $this->selectedValue !== null ? [$this->selectedValue->getId() => $this->selectedValue->getText()] : [];
 	}
 
 }

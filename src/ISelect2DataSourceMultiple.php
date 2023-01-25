@@ -9,8 +9,8 @@ interface ISelect2DataSourceMultiple extends ISelect2DataSearch
 {
 
 	/**
-	 * @param array $keys
-	 * @return Select2ResultEntity[]
+	 * @param array<mixed> $keys
+	 * @return array<Select2ResultEntity>
 	 */
 	function findByKeys(array $keys): array;
 
